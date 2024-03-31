@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tic-Tac-Toe</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background: linear-gradient(135deg, #3498db, #8e44ad);
+  }
+  #board {
+    display: grid;
+    grid-template-columns: repeat(3, 150px);
+    grid-template-rows: repeat(3, 150px);
+    gap: 5px;
+    display: none; 
+  }
+  /* Initially hide the board */
+  .cell {
+    background-color: lightgray;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 3em;
+    cursor: pointer;
+  }
+  .win-draw-message {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    display: none;
+  }
+  #new-game-btn {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-top: 20px;
+    display: none;
+  } 
+    /* Initially hide the restart button */
+
+  #rules {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 10px;
+    border-radius: 5px;
+    display: block;
+  } 
+  /* Display rules initially */
+  
+  #start-game-btn {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-top: 10px;
+  }
+</style>
+</head>
+<body>
+
+<div id="rules">
+  <h2>Rules:</h2>
+  <p>1. The game is played on a grid of 3x3 squares.</p>
+  <p>2. Players take turns marking a square with their symbol ('X' or 'O').</p>
+  <p>3. The first player to get three of their symbols in a row, column, or diagonal wins.</p>
+  <p>4. If all squares are filled and no player has three in a row, the game is a draw.</p>
+  <button id="start-game-btn">Start Game</button>
+</div>
+
+<div id="board"></div>
+<div class="win-draw-message" id="win-draw-message"></div>
+
+<script>
+  const board = document.getElementById('board');
+  const winDrawMessage = document.getElementById('win-draw-message');
+  const newGameBtn = document.getElementById('new-game-btn');
+  const startGameBtn = document.getElementById('start-game-btn');
+  let currentPlayer = 'X';
+  let cells = [];
+
+  // Display rules        
+  // Show the board when the game starts            
+  startGameBtn.addEventListener('click', function() {
+    document.getElementById('rules').style.display = 'none';
+    board.style.display = 'grid'; 
+  });
+
+  // Create the grid
+  for (let i = 0; i < 9; i++) {
+    const cell = document.createElement('div');
+    cell.classList.add('cell');
+    cell.dataset.index = i;
+    cell.addEventListener('click', handleCellClick);
+    board.appendChild(cell);
+    cells.push(cell);
+  }
+
+  // Handle cell click
+  function handleCellClick(event) {
+    const clickedCell = event.target;
+    if (!isValidMove(clickedCell)) return;
+    clickedCell.textContent = currentPlayer;
+    if (checkWin()) {
+      showWinMessage();
+      return;
+    }
+    if (checkDraw()) {
+      showDrawMessage();
+      return;
+    }
+    currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+  }
+
+  // Checking
+  function isValidMove(cell) {
+    return cell.textContent === '';
+  }
+
+  // Checking for a win
+  function checkWin() {
+    const winningCombos = [
+      [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
+      [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
+      [0, 4, 8], [2, 4, 6] // Diagonals
+    ];
+    return winningCombos.some(combo => {
+      return combo.every(index => cells[index].textContent === currentPlayer);
+    });
+  }
+
+  // Checking for a draw
+  function checkDraw() {
+    return cells.every(cell => cell.textContent !== '');
+  }
+
+  // Showing win message
+  function showWinMessage() {
+    winDrawMessage.textContent = `Player ${currentPlayer} wins!`;
+    winDrawMessage.style.display = 'block';
+    newGameBtn.style.display = 'block';
+  }
+
+  // Showing draw message
+  function showDrawMessage() {
+    winDrawMessage.textContent = "It's a draw!";
+    winDrawMessage.style.display = 'block';
+    newGameBtn.style.display = 'block';
+  }
+
+  // Reset the board
+  function resetBoard() {
+    cells.forEach(cell => {
+      cell.textContent = '';
+    });
+    currentPlayer = 'X';
+    winDrawMessage.style.display = 'none';
+    newGameBtn.style.display = 'none';
+  }
+
+  // New game button click handler
+  newGameBtn.addEventListener('click', function() {
+    resetBoard();
+  });
+</script>
+
+<button id="new-game-btn">Restart Game</button>
+
+</body>
+</html>
